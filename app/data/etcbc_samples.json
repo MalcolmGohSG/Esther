@@ -1,0 +1,62 @@
+[
+  {
+    "reference": "Genesis 12:1-3",
+    "book": "Genesis",
+    "hebrew_focus": "לֶךְ-לְךָ",
+    "translation": "Go forth",
+    "morphology": {
+      "part_of_speech": "Imperative masculine singular",
+      "root": "הלך",
+      "notes": "The doubling emphasizes personal engagement; the cohortative nuance invites a journey of trust."
+    },
+    "exegetical_notes": [
+      "Imperative is followed by paragogic pronoun stressing Abram's obedience with personal cost.",
+      "Threefold blessing structure (nation, name, universal blessing) frames covenant mission."
+    ],
+    "themes": ["Calling", "Mission", "Faith"],
+    "lexical_insights": [
+      "ברך occurs five times in the pericope, creating an inclusio of blessing.",
+      "The piel stem intensifies the blessing promise—God as active blesser."
+    ]
+  },
+  {
+    "reference": "Exodus 3:1-12",
+    "book": "Exodus",
+    "hebrew_focus": "אֶהְיֶה עִמָּךְ",
+    "translation": "I will be with you",
+    "morphology": {
+      "part_of_speech": "Qal imperfect 1cs of היה",
+      "root": "היה",
+      "notes": "Imperfect verbal form conveys ongoing presence rather than static name." 
+    },
+    "exegetical_notes": [
+      "The narrative uses the verb ראה in a chiastic pattern to spotlight divine initiative.",
+      "Moses' objections climax in verse 11, answered by covenantal assurance (אֶהְיֶה)."
+    ],
+    "themes": ["Presence", "Calling", "Liberation"],
+    "lexical_insights": [
+      "The noun עֲנִי occurs earlier to highlight Israel's oppression, juxtaposed with divine compassion.",
+      "Mountain imagery (חֹרֵב) anticipates later covenant scenes (Exodus 19)."
+    ]
+  },
+  {
+    "reference": "Psalm 23",
+    "book": "Psalms",
+    "hebrew_focus": "יְהוָה רֹעִי",
+    "translation": "The LORD is my shepherd",
+    "morphology": {
+      "part_of_speech": "Qal participle masculine singular of רעה",
+      "root": "רעה",
+      "notes": "Participle portrays habitual action—the Lord continually shepherds."
+    },
+    "exegetical_notes": [
+      "Alternation between third-person description and second-person address indicates intimacy.",
+      "Verbal sequence (יִרְבִּיצֵנִי, יַנְחֵנִי, יְשׁוֹבֵב) conveys movement from rest to guidance to restoration."
+    ],
+    "themes": ["Trust", "Provision", "Guidance"],
+    "lexical_insights": [
+      "The valley phrase גֵּיא צַלְמָוֶת combines 'shadow' and 'death' to describe intense threat.",
+      "The verb רדף (pursue) is reversed—goodness and mercy chase the psalmist."
+    ]
+  }
+]
