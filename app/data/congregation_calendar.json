@@ -1,0 +1,23 @@
+{
+  "default": {
+    "name": "City Hope Church",
+    "location": "Jerusalem",
+    "significant_dates": [
+      {
+        "date": "2024-09-15",
+        "description": "Community outreach launch week",
+        "emphasis": "Service and hospitality"
+      },
+      {
+        "date": "2024-12-01",
+        "description": "Advent prayer vigil",
+        "emphasis": "Hope and anticipation"
+      }
+    ],
+    "values": [
+      "Scripture immersion",
+      "Intergenerational discipleship",
+      "Missional hospitality"
+    ]
+  }
+}

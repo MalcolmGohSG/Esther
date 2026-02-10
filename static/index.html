@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETCBC Lesson Designer</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="/static/app.js" type="module" defer></script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="overlay"></div>
+      <div class="hero-content">
+        <h1>ETCBC Sermon &amp; Formation Architect</h1>
+        <p>
+          Craft expository sermons, topical outlines, and personal discipleship lessons rooted in the ETCBC linguistic
+          database and aligned with your community's calendar.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card wizard" id="lesson-wizard">
+        <h2>Start with a few details</h2>
+        <form id="wizard-form">
+          <div class="wizard-step active" data-step="1">
+            <h3>Who is this for?</h3>
+            <label>Audience (optional)</label>
+            <input type="text" name="audience" placeholder="Youth leaders, families, seekers..." />
+            <label>Occasion (optional)</label>
+            <input type="text" name="occasion" placeholder="Retreat, Sunday gathering, mentoring session" />
+            <button type="button" class="btn next">Next</button>
+          </div>
+
+          <div class="wizard-step" data-step="2">
+            <h3>When will it be delivered?</h3>
+            <label>Date</label>
+            <input type="date" name="date" />
+            <p class="hint">We will correlate your date with the Jewish calendar and your congregation's milestones.</p>
+            <button type="button" class="btn prev">Back</button>
+            <button type="button" class="btn next">Next</button>
+          </div>
+
+          <div class="wizard-step" data-step="3">
+            <h3>What focus should we explore?</h3>
+            <label>Primary Passage</label>
+            <input type="text" name="passage" placeholder="e.g., Genesis 12:1-3" />
+            <label>Topic or Theme</label>
+            <input type="text" name="topic" placeholder="Calling, justice, formation..." />
+            <label>Lesson Type</label>
+            <select name="lesson_type">
+              <option value="expository">Expository Sermon</option>
+              <option value="topical">Topical Sermon</option>
+              <option value="bible_study">Bible Study</option>
+              <option value="personal">One-to-one Formation</option>
+            </select>
+            <button type="button" class="btn prev">Back</button>
+            <button type="button" class="btn next">Next</button>
+          </div>
+
+          <div class="wizard-step" data-step="4">
+            <h3>How long do you have?</h3>
+            <label>Estimated Duration (minutes)</label>
+            <input type="number" name="estimated_minutes" min="10" max="120" value="35" />
+            <label class="checkbox">
+              <input type="checkbox" name="interpreted" />
+              <span>Will this be interpreted into another language?</span>
+            </label>
+            <p class="hint">Interpretation shortens the delivery time in the generated plan.</p>
+            <button type="button" class="btn prev">Back</button>
+            <button type="submit" class="btn primary">Generate Lesson</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card results hidden" id="results">
+        <div class="results-header">
+          <div>
+            <h2 id="lesson-title"></h2>
+            <p id="runtime"></p>
+          </div>
+          <div class="actions">
+            <a id="pptx-download" class="btn secondary" href="#" download>Download PowerPoint</a>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="panel">
+            <h3>Introduction</h3>
+            <div id="intro-canvas" class="editable" contenteditable="true"></div>
+          </article>
+          <article class="panel">
+            <h3>Conclusion</h3>
+            <div id="conclusion-canvas" class="editable" contenteditable="true"></div>
+          </article>
+        </div>
+
+        <section class="panel">
+          <h3>Teaching Sections</h3>
+          <div id="sections-canvas"></div>
+        </section>
+
+        <section class="panel info-grid">
+          <div>
+            <h4>Festival &amp; Calendar Insights</h4>
+            <ul id="festival-list" class="info-list"></ul>
+          </div>
+          <div>
+            <h4>Congregational Context</h4>
+            <div id="congregation-context"></div>
+          </div>
+          <div>
+            <h4>GitHub / ETCBC Sources</h4>
+            <ul id="github-list" class="info-list"></ul>
+          </div>
+          <div>
+            <h4>Hebrew Linguistic Focus</h4>
+            <p id="hebrew-focus"></p>
+            <canvas id="linguistic-chart" height="180"></canvas>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Slides Overview</h3>
+          <div id="slides-list" class="slides"></div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
