@@ -49,14 +49,43 @@ def ensure_generated_dir() -> None:
     os.makedirs(GENERATED_DIR, exist_ok=True)
 
 
-def search_etcbc(query: str, limit: int = 5) -> List[dict]:
-    """Attempt to search the ETCBC GitHub repository. Fallback to local samples."""
+_GITHUB_SEARCH_CACHE: dict = {}
+_GITHUB_SEARCH_CACHE_TTL_SECONDS = 300
+_GITHUB_SEARCH_TIMEOUT_SECONDS = 2.0
+
+
+def _fallback_sources(limit: int) -> List[dict]:
+    fallback = []
+    for sample in ETCBC_SAMPLES:
+        fallback.append(
+            {
+                "name": sample["reference"],
+                "path": f"samples/{sample['book'].lower()}.json",
+                "html_url": "https://github.com/ETCBC/bhsa",
+                "repository": "ETCBC/bhsa",
+            }
+        )
+    return fallback[:limit]
+
+
+async def search_etcbc(query: str, limit: int = 5) -> List[dict]:
+    """Attempt to search the ETCBC GitHub repository. Fallback to local samples.
+
+    Runs as a real async call (not a blocking client) and is time-boxed well
+    under typical request budgets so a slow/rate-limited GitHub response can
+    never stall other concurrent requests on the server.
+    """
+    cache_key = (query, limit)
+    cached = _GITHUB_SEARCH_CACHE.get(cache_key)
+    if cached and (datetime.utcnow().timestamp() - cached[0]) < _GITHUB_SEARCH_CACHE_TTL_SECONDS:
+        return cached[1]
+
     headers = {"Accept": "application/vnd.github.v3+json"}
     url = "https://api.github.com/search/code"
     params = {"q": f"{query} repo:ETCBC/bhsa", "per_page": str(limit)}
     try:
-        with httpx.Client(timeout=5.0) as client:
-            response = client.get(url, params=params, headers=headers)
+        async with httpx.AsyncClient(timeout=_GITHUB_SEARCH_TIMEOUT_SECONDS) as client:
+            response = await client.get(url, params=params, headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 items = []
@@ -70,21 +99,13 @@ def search_etcbc(query: str, limit: int = 5) -> List[dict]:
                         }
                     )
                 if items:
+                    _GITHUB_SEARCH_CACHE[cache_key] = (datetime.utcnow().timestamp(), items)
                     return items
     except httpx.HTTPError:
         pass
-    # fallback to local sample metadata
-    fallback = []
-    for sample in ETCBC_SAMPLES:
-        fallback.append(
-            {
-                "name": sample["reference"],
-                "path": f"samples/{sample['book'].lower()}.json",
-                "html_url": "https://github.com/ETCBC/bhsa",
-                "repository": "ETCBC/bhsa",
-            }
-        )
-    return fallback[:limit]
+    fallback = _fallback_sources(limit)
+    _GITHUB_SEARCH_CACHE[cache_key] = (datetime.utcnow().timestamp(), fallback)
+    return fallback
 
 
 def select_sample(topic: Optional[str], passage: Optional[str]) -> dict:
@@ -297,7 +318,7 @@ class LessonRequest(BaseModel):
     date: Optional[str]
     topic: Optional[str]
     passage: Optional[str]
-    lesson_type: str = Field(regex="^(expository|topical|bible_study|personal)$")
+    lesson_type: str = Field(pattern="^(expository|topical|bible_study|personal)$")
     estimated_minutes: int = Field(default=35, ge=10, le=120)
     interpreted: bool = False
     congregation_id: str = "default"
@@ -345,7 +366,7 @@ async def generate_lesson(payload: LessonRequest):
     runtime_minutes = estimate_runtime(payload.estimated_minutes, payload.interpreted)
 
     github_query = payload.passage or payload.topic or sample["reference"]
-    github_sources = search_etcbc(github_query)
+    github_sources = await search_etcbc(github_query)
 
     lesson = {
         "title": f"{sample['reference']} — {payload.lesson_type.replace('_', ' ').title()}",
