@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import uuid
 from datetime import datetime
 from typing import List, Optional, Tuple
@@ -19,6 +20,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 GENERATED_DIR = os.path.join(os.path.dirname(BASE_DIR), "generated")
 STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "static")
+PPTX_NAME = re.compile(r"lesson_[0-9a-f]{32}\.pptx")
 
 with open(os.path.join(DATA_DIR, "etcbc_samples.json"), "r", encoding="utf-8") as fh:
     ETCBC_SAMPLES = json.load(fh)
@@ -375,6 +377,10 @@ async def generate_lesson(payload: LessonRequest):
 
 @app.get("/api/pptx/{filename}")
 async def download_pptx(filename: str):
+    # Only names create_pptx itself produces. Anything else, such as an
+    # encoded "../" or another file left in generated/, is a 404.
+    if not PPTX_NAME.fullmatch(filename):
+        raise HTTPException(status_code=404, detail="File not found")
     file_path = os.path.join(GENERATED_DIR, filename)
     if not os.path.isfile(file_path):
         raise HTTPException(status_code=404, detail="File not found")

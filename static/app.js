@@ -17,6 +17,29 @@ const chartCanvas = document.getElementById('linguistic-chart');
 let currentStepIndex = 0;
 let linguisticChart = null;
 
+// Everything below that builds markup from the API response passes each value
+// through escapeHtml first. The values are mostly curated JSON today, but
+// github_sources comes from GitHub's search API and the congregation fields
+// from an editable file, so none of it is trusted to be markup.
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Only web links become hrefs; a javascript: or data: URL would run on click.
+function safeUrl(value) {
+  try {
+    const url = new URL(String(value), window.location.href);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '#';
+  } catch {
+    return '#';
+  }
+}
+
 function updateStep(newIndex) {
   if (newIndex < 0 || newIndex >= steps.length) return;
   steps[currentStepIndex].classList.remove('active');
@@ -83,12 +106,12 @@ function renderResults(data) {
     const block = document.createElement('div');
     block.className = 'section-block';
     block.innerHTML = `
-      <h4>${index + 1}. ${section.title}</h4>
-      <div class="editable" contenteditable="true">${section.content}</div>
+      <h4>${index + 1}. ${escapeHtml(section.title)}</h4>
+      <div class="editable" contenteditable="true">${escapeHtml(section.content)}</div>
       <h5>Exegetical Notes</h5>
-      <div class="editable" contenteditable="true">${section.exegetical.join('\n')}</div>
+      <div class="editable" contenteditable="true">${escapeHtml(section.exegetical.join('\n'))}</div>
       <h5>Formation &amp; Practice</h5>
-      <div class="editable" contenteditable="true">${section.application}</div>
+      <div class="editable" contenteditable="true">${escapeHtml(section.application)}</div>
     `;
     sectionsCanvas.appendChild(block);
   });
@@ -99,7 +122,7 @@ function renderResults(data) {
   } else {
     festivals.forEach((festival) => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${festival.festival}</strong><br/>${festival.emphasis}<br/><small>${festival.days_apart} day(s) from your date • ${festival.festival_date}</small>`;
+      li.innerHTML = `<strong>${escapeHtml(festival.festival)}</strong><br/>${escapeHtml(festival.emphasis)}<br/><small>${escapeHtml(festival.days_apart)} day(s) from your date • ${escapeHtml(festival.festival_date)}</small>`;
       festivalList.appendChild(li);
     });
   }
@@ -107,7 +130,7 @@ function renderResults(data) {
   congregationContext.innerHTML = '';
   if (congregation.name) {
     const heading = document.createElement('p');
-    heading.innerHTML = `<strong>${congregation.name}</strong> — ${congregation.location || 'Local context'}`;
+    heading.innerHTML = `<strong>${escapeHtml(congregation.name)}</strong> — ${escapeHtml(congregation.location || 'Local context')}`;
     congregationContext.appendChild(heading);
   }
   if (congregation.values && congregation.values.length) {
@@ -120,7 +143,7 @@ function renderResults(data) {
     list.className = 'info-list';
     congregation.nearby_events.forEach((event) => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${event.description}</strong><br/><small>${event.days_apart} day(s) away • Emphasis: ${event.emphasis}</small>`;
+      li.innerHTML = `<strong>${escapeHtml(event.description)}</strong><br/><small>${escapeHtml(event.days_apart)} day(s) away • Emphasis: ${escapeHtml(event.emphasis)}</small>`;
       list.appendChild(li);
     });
     congregationContext.appendChild(list);
@@ -133,7 +156,7 @@ function renderResults(data) {
   githubList.innerHTML = '';
   github_sources.forEach((source) => {
     const li = document.createElement('li');
-    li.innerHTML = `<a href="${source.html_url}" target="_blank" rel="noopener">${source.name}</a><br/><small>${source.repository}</small>`;
+    li.innerHTML = `<a href="${escapeHtml(safeUrl(source.html_url))}" target="_blank" rel="noopener">${escapeHtml(source.name)}</a><br/><small>${escapeHtml(source.repository)}</small>`;
     githubList.appendChild(li);
   });
 
@@ -142,14 +165,14 @@ function renderResults(data) {
     const card = document.createElement('div');
     card.className = 'slide-card';
     card.innerHTML = `
-      <h5>Slide ${index + 1}: ${slide.title}</h5>
-      <ul>${slide.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>
-      <p><strong>Speaker Notes:</strong> ${slide.notes}</p>
+      <h5>Slide ${index + 1}: ${escapeHtml(slide.title)}</h5>
+      <ul>${slide.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}</ul>
+      <p><strong>Speaker Notes:</strong> ${escapeHtml(slide.notes)}</p>
     `;
     slidesList.appendChild(card);
   });
 
-  pptxDownload.href = pptx_download;
+  pptxDownload.href = safeUrl(pptx_download);
   pptxDownload.setAttribute('download', `${lesson.title.replace(/\s+/g, '_')}.pptx`);
 
   renderChart(lesson);
