@@ -5,4 +5,4 @@ httpx
 python-pptx
 convertdate
 python-dateutil
-pydantic
+pydantic<2
